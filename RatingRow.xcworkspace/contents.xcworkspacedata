@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Carthage/Checkouts/Cosmos/../../../Example/Example.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Carthage/Checkouts/Cosmos/../Eureka/Eureka.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Carthage/Checkouts/Cosmos/Cosmos.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "container:RatingRow.xcodeproj">
+   </FileRef>
+</Workspace>
