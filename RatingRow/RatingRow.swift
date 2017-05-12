@@ -34,7 +34,7 @@ public class _RatingRow: Row<Rating> {
     required public init(tag: String?) {
         super.init(tag: tag)
         // We set the cellProvider to load the .xib corresponding to our cell
-        cellProvider = CellProvider<Rating>(nibName: "Rating")
+        cellProvider = CellProvider<Rating>(nibName: "Rating", bundle: Resources.bundle)
     }
 }
 

@@ -14,6 +14,7 @@
 		F83E19721EC5B9790057FF64 /* Eureka.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F83E19711EC5B9790057FF64 /* Eureka.framework */; };
 		F83E19741EC5BA290057FF64 /* RatingRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83E19731EC5BA290057FF64 /* RatingRow.swift */; };
 		F83E19761EC5BABE0057FF64 /* Rating.xib in Resources */ = {isa = PBXBuildFile; fileRef = F83E19751EC5BABE0057FF64 /* Rating.xib */; };
+		F83E19C51EC5DC880057FF64 /* Resources.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83E19C41EC5DC880057FF64 /* Resources.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		F83E19711EC5B9790057FF64 /* Eureka.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Eureka.framework; path = "Carthage/Checkouts/Eureka/build/Debug-iphoneos/Eureka.framework"; sourceTree = "<group>"; };
 		F83E19731EC5BA290057FF64 /* RatingRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingRow.swift; sourceTree = "<group>"; };
 		F83E19751EC5BABE0057FF64 /* Rating.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Rating.xib; sourceTree = "<group>"; };
+		F83E19C41EC5DC880057FF64 /* Resources.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resources.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 				F83E194F1EC5B74B0057FF64 /* Info.plist */,
 				F83E19731EC5BA290057FF64 /* RatingRow.swift */,
 				F83E19751EC5BABE0057FF64 /* Rating.xib */,
+				F83E19C41EC5DC880057FF64 /* Resources.swift */,
 			);
 			path = RatingRow;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F83E19741EC5BA290057FF64 /* RatingRow.swift in Sources */,
+				F83E19C51EC5DC880057FF64 /* Resources.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +440,7 @@
 				F83E19611EC5B74B0057FF64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F83E19621EC5B74B0057FF64 /* Build configuration list for PBXNativeTarget "RatingRowTests" */ = {
 			isa = XCConfigurationList;
@@ -444,6 +449,7 @@
 				F83E19641EC5B74B0057FF64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
