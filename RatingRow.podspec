@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name = "RatingRow"
-  spec.version = "0.0.2"
+  spec.version = "0.0.3"
   spec.summary = "Rating row in Eureka"
   spec.homepage = "https://github.com/canner/RatingRow"
   spec.license = { type: 'MIT', file: 'LICENSE' }
