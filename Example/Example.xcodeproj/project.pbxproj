@@ -15,6 +15,7 @@
 		F83E19911EC5BAFF0057FF64 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F83E198F1EC5BAFF0057FF64 /* LaunchScreen.storyboard */; };
 		F83E199C1EC5BAFF0057FF64 /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83E199B1EC5BAFF0057FF64 /* ExampleTests.swift */; };
 		F83E19A71EC5BB000057FF64 /* ExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83E19A61EC5BB000057FF64 /* ExampleUITests.swift */; };
+		F886DDB71ECD4CC80083D106 /* RatingRow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F886DDB61ECD4CC70083D106 /* RatingRow.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		F83E19A21EC5BB000057FF64 /* ExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F83E19A61EC5BB000057FF64 /* ExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleUITests.swift; sourceTree = "<group>"; };
 		F83E19A81EC5BB000057FF64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F886DDB61ECD4CC70083D106 /* RatingRow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RatingRow.framework; path = "../../../../Library/Developer/Xcode/DerivedData/RatingRow-afoeutxsepljtedbapzwpchguilm/Build/Products/Debug-iphonesimulator/RatingRow.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F886DDB71ECD4CC80083D106 /* RatingRow.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +86,7 @@
 				F83E199A1EC5BAFF0057FF64 /* ExampleTests */,
 				F83E19A51EC5BB000057FF64 /* ExampleUITests */,
 				F83E19811EC5BAFF0057FF64 /* Products */,
+				F886DDB51ECD4CC70083D106 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -126,6 +130,14 @@
 				F83E19A81EC5BB000057FF64 /* Info.plist */,
 			);
 			path = ExampleUITests;
+			sourceTree = "<group>";
+		};
+		F886DDB51ECD4CC70083D106 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F886DDB61ECD4CC70083D106 /* RatingRow.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -511,6 +523,7 @@
 				F83E19AD1EC5BB000057FF64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F83E19AE1EC5BB000057FF64 /* Build configuration list for PBXNativeTarget "ExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -519,6 +532,7 @@
 				F83E19B01EC5BB000057FF64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F83E19B11EC5BB000057FF64 /* Build configuration list for PBXNativeTarget "ExampleUITests" */ = {
 			isa = XCConfigurationList;
@@ -527,6 +541,7 @@
 				F83E19B31EC5BB000057FF64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
