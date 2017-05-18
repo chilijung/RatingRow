@@ -2,7 +2,7 @@
 
 A customized rating row in [Eureka](https://github.com/xmartlabs/Eureka), based on [Cosmos - star rating control library](https://github.com/marketplacer/Cosmos)
 
-![RatingRow](./ratingRow.png)
+<img src="./ratingRow.png" width="200px"/>
 
 ## Install via pod
 
