@@ -23,6 +23,7 @@
 // THE SOFTWARE.
 
 import Foundation
+import UIKit
 
 /**
  *  Protocol that every row that displays a new view controller must conform to.
@@ -30,13 +31,13 @@ import Foundation
  */
 public protocol PresenterRowType: TypedRowType {
 
-    associatedtype ProviderType : UIViewController, TypedRowControllerType
+    associatedtype PresentedControllerType : UIViewController, TypedRowControllerType
 
     /// Defines how the view controller will be presented, pushed, etc.
-    var presentationMode: PresentationMode<ProviderType>? { get set }
+    var presentationMode: PresentationMode<PresentedControllerType>? { get set }
 
     /// Will be called before the presentation occurs.
-    var onPresentCallback: ((FormViewController, ProviderType) -> Void)? { get set }
+    var onPresentCallback: ((FormViewController, PresentedControllerType) -> Void)? { get set }
 }
 
 extension PresenterRowType {
@@ -48,7 +49,8 @@ extension PresenterRowType {
      
      - returns: this row
      */
-    public func onPresent(_ callback: ((FormViewController, ProviderType) -> Void)?) -> Self {
+    @discardableResult
+    public func onPresent(_ callback: ((FormViewController, PresentedControllerType) -> Void)?) -> Self {
         onPresentCallback = callback
         return self
     }

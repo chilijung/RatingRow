@@ -32,6 +32,21 @@ class CosmosViewTests: XCTestCase {
     XCTAssertEqual(10, size.height)
   }
   
+  func testUpdateFrameSize_whenSettingsChange() {
+    obj.settings.starSize = 10
+    obj.settings.starMargin = 4
+    obj.rating = 4
+    
+    // 5 * 10 (width of 5 stars)
+    //   + 4 * 6 (4 margins between stars)
+    XCTAssertEqual(66, obj.frame.width)
+    
+    obj.settings.starSize = 20
+    // 5 * 20 (width of 5 stars)
+    //   + 4 * 6 (4 margins between stars)
+    XCTAssertEqual(116, obj.frame.width)
+  }
+  
   func testShowContentSizeWithText() {
     obj.settings.starSize = 10
     obj.settings.starMargin = 4
@@ -42,8 +57,8 @@ class CosmosViewTests: XCTestCase {
     obj.rating = 4
     obj.text = "123"
     
-    let sizeAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 15)]
-    let textSize = NSString(string: "123").size(attributes: sizeAttributes)
+    let sizeAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]
+    let textSize = NSString(string: "123").size(withAttributes: sizeAttributes)
     
     let size = obj.intrinsicContentSize
     
@@ -73,8 +88,8 @@ class CosmosViewTests: XCTestCase {
       obj.rating = 4
       obj.text = "123"
       
-      let sizeAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 15)]
-      let textSize = NSString(string: "123").size(attributes: sizeAttributes)
+      let sizeAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]
+      let textSize = NSString(string: "123").size(withAttributes: sizeAttributes)
       
       let size = obj.intrinsicContentSize
       
@@ -206,7 +221,7 @@ class CosmosViewTests: XCTestCase {
     obj.settings.updateOnTouch = false
     XCTAssertEqual("Rating", obj.accessibilityLabel)
     XCTAssertEqual("2.5", obj.accessibilityValue)
-    XCTAssertEqual(UIAccessibilityTraitNone, obj.accessibilityTraits)
+    XCTAssertEqual(UIAccessibilityTraits.none, obj.accessibilityTraits)
   }
   
   func testAccessibilityIncrement() {

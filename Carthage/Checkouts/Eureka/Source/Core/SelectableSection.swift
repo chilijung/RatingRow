@@ -23,6 +23,7 @@
 // THE SOFTWARE.
 
 import Foundation
+import UIKit
 
 // MARK: SelectableSection
 
@@ -61,8 +62,7 @@ public protocol SelectableSectionType: Collection {
     func selectedRows() -> [SelectableRow]
 }
 
-extension SelectableSectionType where Self: Section, Self.Iterator == IndexingIterator<Section>, Self.Iterator.Element == BaseRow {
-
+extension SelectableSectionType where Self: Section {
     /**
      Returns the selected row of this section. Should be used if selectionType is SingleSelection
      */
@@ -74,9 +74,8 @@ extension SelectableSectionType where Self: Section, Self.Iterator == IndexingIt
      Returns the selected rows of this section. Should be used if selectionType is MultipleSelection
      */
     public func selectedRows() -> [SelectableRow] {
-        return filter({ (row: BaseRow) -> Bool in
-            row is SelectableRow && row.baseValue != nil
-        }).map({ $0 as! SelectableRow})
+        let selectedRows: [BaseRow] = self.filter { $0 is SelectableRow && $0.baseValue != nil }
+        return selectedRows.map { $0 as! SelectableRow }
     }
 
     /**
@@ -86,12 +85,13 @@ extension SelectableSectionType where Self: Section, Self.Iterator == IndexingIt
         for row in rows {
             if let row = row as? SelectableRow {
                 row.onCellSelection { [weak self] cell, row in
-                    guard let s = self else { return }
+                    guard let s = self, !row.isDisabled else { return }
                     switch s.selectionType {
                     case .multipleSelection:
                         row.value = row.value == nil ? row.selectableValue : nil
                     case let .singleSelection(enableDeselection):
-                        s.filter { $0.baseValue != nil && $0 != row }.forEach {
+                        s.forEach {
+                            guard $0.baseValue != nil && $0 != row && $0 is SelectableRow else { return }
                             $0.baseValue = nil
                             $0.updateCell()
                         }
@@ -112,7 +112,7 @@ extension SelectableSectionType where Self: Section, Self.Iterator == IndexingIt
 }
 
 /// A subclass of Section that serves to create a section with a list of selectable options.
-open class SelectableSection<Row: SelectableRowType> : Section, SelectableSectionType where Row: BaseRow {
+open class SelectableSection<Row>: Section, SelectableSectionType where Row: SelectableRowType, Row: BaseRow {
 
     public typealias SelectableRow = Row
 
@@ -122,23 +122,32 @@ open class SelectableSection<Row: SelectableRowType> : Section, SelectableSectio
     /// A closure called when a row of this section is selected.
     public var onSelectSelectableRow: ((Row.Cell, Row) -> Void)?
 
-    public override init(_ initializer: (SelectableSection<Row>) -> Void) {
-        super.init({ section in initializer(section as! SelectableSection<Row>) })
+    public override init(_ initializer: @escaping (SelectableSection<Row>) -> Void) {
+        super.init({ _ in })
+        initializer(self)
     }
 
-    public init(_ header: String, selectionType: SelectionType, _ initializer: (SelectableSection<Row>) -> Void = { _ in }) {
+    public init(_ header: String, selectionType: SelectionType, _ initializer: @escaping (SelectableSection<Row>) -> Void = { _ in }) {
         self.selectionType = selectionType
-        super.init(header, { section in initializer(section as! SelectableSection<Row>) })
+        super.init(header, { _ in })
+        initializer(self)
     }
 
-    public init(header: String, footer: String, selectionType: SelectionType, _ initializer: (SelectableSection<Row>) -> Void = { _ in }) {
+    public init(header: String, footer: String, selectionType: SelectionType, _ initializer: @escaping (SelectableSection<Row>) -> Void = { _ in }) {
         self.selectionType = selectionType
-        super.init(header: header, footer: footer, { section in initializer(section as! SelectableSection<Row>) })
+        super.init(header: header, footer: footer, { _ in })
+        initializer(self)
     }
 
     public required init() {
         super.init()
     }
+
+    #if swift(>=4.1)
+    public required init<S>(_ elements: S) where S : Sequence, S.Element == BaseRow {
+        super.init(elements)
+    }
+    #endif
 
     open override func rowsHaveBeenAdded(_ rows: [BaseRow], at: IndexSet) {
         prepare(selectableRows: rows)

@@ -32,7 +32,7 @@ public protocol FormDelegate : class {
     func rowsHaveBeenAdded(_ rows: [BaseRow], at: [IndexPath])
     func rowsHaveBeenRemoved(_ rows: [BaseRow], at: [IndexPath])
     func rowsHaveBeenReplaced(oldRows: [BaseRow], newRows: [BaseRow], at: [IndexPath])
-    func valueHasBeenChanged(for: BaseRow, oldValue: Any?, newValue: Any?)
+    func valueHasBeenChanged(for row: BaseRow, oldValue: Any?, newValue: Any?)
 }
 
 // MARK: Form
@@ -70,7 +70,7 @@ public final class Form {
     /**
      Returns the row whose tag is passed as parameter. Uses a dictionary to get the row faster
      */
-    public func rowBy<T: Equatable>(tag: String) -> RowOf<T>? {
+    public func rowBy<T>(tag: String) -> RowOf<T>? where T: Equatable{
         let row: BaseRow? = rowBy(tag: tag)
         return row as? RowOf<T>
     }
@@ -78,7 +78,7 @@ public final class Form {
     /**
      Returns the row whose tag is passed as parameter. Uses a dictionary to get the row faster
      */
-    public func rowBy<Row: RowType>(tag: String) -> Row? {
+    public func rowBy<Row>(tag: String) -> Row? where Row: RowType{
         let row: BaseRow? = rowBy(tag: tag)
         return row as? Row
     }
@@ -99,31 +99,23 @@ public final class Form {
 
     /**
      Method used to get all the values of all the rows of the form. Only rows with tag are included.
-     
+
      - parameter includeHidden: If the values of hidden rows should be included.
-     
+
      - returns: A dictionary mapping the rows tag to its value. [tag: value]
      */
     public func values(includeHidden: Bool = false) -> [String: Any?] {
         if includeHidden {
-            return allRows.filter({ $0.tag != nil })
-                .reduce([String: Any?]()) {
-                    var result = $0
-                    result[$1.tag!] = $1.baseValue
-                    return result
-                }
+            return getValues(for: allRows.filter({ $0.tag != nil }))
+                .merging(getValues(for: allSections.filter({ $0 is MultivaluedSection && $0.tag != nil }) as? [MultivaluedSection]), uniquingKeysWith: {(_, new) in new })
         }
-        return rows.filter({ $0.tag != nil })
-            .reduce([String: Any?]()) {
-                var result = $0
-                result[$1.tag!] = $1.baseValue
-                return result
-            }
+        return getValues(for: rows.filter({ $0.tag != nil }))
+            .merging(getValues(for: allSections.filter({ $0 is MultivaluedSection && $0.tag != nil }) as? [MultivaluedSection]), uniquingKeysWith: {(_, new) in new })
     }
 
     /**
      Set values to the rows of this form
-     
+
      - parameter values: A dictionary mapping tag to value of the rows to be set. [tag: value]
      */
     public func setValues(_ values: [String: Any?]) {
@@ -172,7 +164,24 @@ extension Form: MutableCollection {
 
     public subscript (_ position: Int) -> Section {
         get { return kvoWrapper.sections[position] as! Section }
-        set { kvoWrapper.sections[position] = newValue }
+        set {
+            if position > kvoWrapper.sections.count {
+                assertionFailure("Form: Index out of bounds")
+            }
+
+            if position < kvoWrapper.sections.count {
+                let oldSection = kvoWrapper.sections[position]
+                let oldSectionIndex = kvoWrapper._allSections.index(of: oldSection as! Section)!
+                // Remove the previous section from the form
+                kvoWrapper._allSections[oldSectionIndex].willBeRemovedFromForm()
+                kvoWrapper._allSections[oldSectionIndex] = newValue
+            } else {
+                kvoWrapper._allSections.append(newValue)
+            }
+
+            kvoWrapper.sections[position] = newValue
+            newValue.wasAddedTo(form: self)
+        }
     }
     public func index(after i: Int) -> Int {
         return i+1 <= endIndex ? i+1 : endIndex
@@ -232,8 +241,8 @@ extension Form : RangeReplaceableCollection {
     private func indexForInsertion(at index: Int) -> Int {
         guard index != 0 else { return 0 }
 
-        let row = kvoWrapper.sections[index-1]
-        if let i = kvoWrapper._allSections.index(of: row as! Section) {
+        let section = kvoWrapper.sections[index-1]
+        if let i = kvoWrapper._allSections.index(of: section as! Section) {
             return i + 1
         }
         return kvoWrapper._allSections.count
@@ -246,7 +255,7 @@ extension Form {
     // MARK: Private Helpers
 
     class KVOWrapper: NSObject {
-        dynamic private var _sections = NSMutableArray()
+        @objc dynamic private var _sections = NSMutableArray()
         var sections: NSMutableArray { return mutableArrayValue(forKey: "_sections") }
         var _allSections = [Section]()
         private weak var form: Form?
@@ -254,7 +263,7 @@ extension Form {
         init(form: Form) {
             self.form = form
             super.init()
-            addObserver(self, forKeyPath: "_sections", options: NSKeyValueObservingOptions.new.union(.old), context:nil)
+            addObserver(self, forKeyPath: "_sections", options: [.new, .old], context:nil)
         }
 
         deinit {
@@ -343,17 +352,46 @@ extension Form {
         }
         kvoWrapper.sections.insert(section, at: formIndex == NSNotFound ? 0 : formIndex + 1 )
     }
+	
+	var containsMultivaluedSection: Bool {
+		return kvoWrapper._allSections.contains { $0 is MultivaluedSection }
+	}
+
+    func getValues(for rows: [BaseRow]) -> [String: Any?] {
+        return rows.reduce([String: Any?]()) {
+            var result = $0
+            result[$1.tag!] = $1.baseValue
+            return result
+        }
+    }
+
+    func getValues(for multivaluedSections: [MultivaluedSection]?) -> [String: [Any?]] {
+        return multivaluedSections?.reduce([String: [Any?]]()) {
+            var result = $0
+            result[$1.tag!] = $1.values()
+            return result
+            } ?? [:]
+    }
+
 }
 
 extension Form {
 
     @discardableResult
-    public func validate(includeHidden: Bool = false) -> [ValidationError] {
-        let rowsToValidate = includeHidden ? allRows : rows
-        return rowsToValidate.reduce([ValidationError]()) { res, row in
+    public func validate(includeHidden: Bool = false, includeDisabled: Bool = true) -> [ValidationError] {
+        let rowsWithHiddenFilter = includeHidden ? allRows : rows
+        let rowsWithDisabledFilter = includeDisabled ? rowsWithHiddenFilter : rowsWithHiddenFilter.filter { $0.isDisabled != true }
+        
+        return rowsWithDisabledFilter.reduce([ValidationError]()) { res, row in
             var res = res
             res.append(contentsOf: row.validate())
             return res
         }
     }
+    
+    // Reset rows validation
+    public func cleanValidationErrors(){
+        allRows.forEach { $0.cleanValidationErrors() }
+    }
 }
+
