@@ -445,6 +445,9 @@ struct CosmosDefaultSettings {
   /// The lowest rating that user can set by touching the stars.
   static let minTouchRating: Double = 1
   
+  /// Set to `false` if you don't want to pass touches to superview (can be useful in a table view).
+  static let passTouchesToSuperview = true
+  
   /// When `true` the star fill level is updated when user touches the cosmos view. When `false` the Cosmos view only shows the rating and does not act as the input control.
   static let updateOnTouch = true
 }
@@ -1085,6 +1088,9 @@ public struct CosmosSettings {
   /// The lowest rating that user can set by touching the stars.
   public var minTouchRating: Double = CosmosDefaultSettings.minTouchRating
   
+  /// Set to `false` if you don't want to pass touches to superview (can be useful in a table view).
+  public var passTouchesToSuperview = CosmosDefaultSettings.passTouchesToSuperview
+  
   /// When `true` the star fill level is updated when user touches the cosmos view. When `false` the Cosmos view only shows the rating and does not act as the input control.
   public var updateOnTouch = CosmosDefaultSettings.updateOnTouch
 }
@@ -1408,14 +1414,14 @@ Shows: ★★★★☆ (123)
   
   /// Overriding the function to detect the first touch gesture.
   open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesBegan(touches, with: event)
+    if settings.passTouchesToSuperview { super.touchesBegan(touches, with: event) }
     guard let location = touchLocationFromBeginningOfRating(touches) else { return }
     onDidTouch(location)
   }
   
   /// Overriding the function to detect touch move.
   open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesMoved(touches, with: event)
+    if settings.passTouchesToSuperview { super.touchesMoved(touches, with: event) }
     guard let location = touchLocationFromBeginningOfRating(touches) else { return }
     onDidTouch(location)
   }
@@ -1433,8 +1439,7 @@ Shows: ★★★★☆ (123)
   
   /// Detecting event when the user lifts their finger.
   open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesEnded(touches, with: event)
-    
+    if settings.passTouchesToSuperview { super.touchesEnded(touches, with: event) }
     didFinishTouchingCosmos?(rating)
   }
 
@@ -1445,8 +1450,7 @@ Shows: ★★★★☆ (123)
    
    */
   open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesCancelled(touches, with: event)
-    
+    if settings.passTouchesToSuperview { super.touchesCancelled(touches, with: event) }
     didFinishTouchingCosmos?(rating)
   }
 

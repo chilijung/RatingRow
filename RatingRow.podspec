@@ -11,6 +11,6 @@ Pod::Spec.new do |spec|
   spec.source = { git: "https://github.com/canner/RatingRow.git", tag: "v#{spec.version}", submodules: true }
   spec.source_files = "RatingRow/**/*.{h,swift}"
   spec.ios.frameworks = 'UIKit', 'Foundation'
-  spec.dependency "Eureka", "~> 4.0"
-  spec.dependency "Cosmos", "~> 17.0"
+  spec.dependency "Eureka", "~> 5.0"
+  spec.dependency "Cosmos", "~> 18.0"
 end
