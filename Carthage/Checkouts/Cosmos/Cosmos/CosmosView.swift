@@ -37,7 +37,7 @@ Shows: ★★★★☆ (123)
   }
   
   /// Star rating settings.
-  open var settings = CosmosSettings() {
+  open var settings: CosmosSettings = .default {
     didSet {
       update()
     }
@@ -52,17 +52,16 @@ Shows: ★★★★☆ (123)
     
     update()
   }
-  
-  
+
   /**
 
   Initializes and returns a newly allocated cosmos view object.
   
   */
-  convenience public init() {
-    self.init(frame: CGRect())
+  public convenience init(settings: CosmosSettings = .default) {
+    self.init(frame: .zero, settings: settings)
   }
-  
+
   /**
 
   Initializes and returns a newly allocated cosmos view object with the specified frame rectangle.
@@ -70,11 +69,14 @@ Shows: ★★★★☆ (123)
   - parameter frame: The frame rectangle for the view.
   
   */
-  override public init(frame: CGRect) {
+  override public convenience init(frame: CGRect) {
+    self.init(frame: frame, settings: .default)
+  }
+
+  public init(frame: CGRect, settings: CosmosSettings) {
     super.init(frame: frame)
+    self.settings = settings
     update()
-    self.frame.size = intrinsicContentSize
-    
     improvePerformance()
   }
   
@@ -194,11 +196,27 @@ Shows: ★★★★☆ (123)
   private func updateSize(_ layers: [CALayer]) {
     viewSize = CosmosSize.calculateSizeToFitLayers(layers)
     invalidateIntrinsicContentSize()
+
+    // Stretch the view to include all stars and the text.
+    // Needed when used without Auto Layout to receive touches for all stars.
+    frame.size = intrinsicContentSize
   }
   
   /// Returns the content size to fit all the star and text layers.
   override open var intrinsicContentSize:CGSize {
     return viewSize
+  }
+  
+  /**
+   
+  Prepares the Cosmos view for reuse in a table view cell.
+  If the cosmos view is used in a table view cell, call this method after the
+  cell is dequeued. Alternatively, override UITableViewCell's prepareForReuse method and call
+  this method from there.
+   
+  */
+  open func prepareForReuse() {
+    previousRatingForDidTouchCallback = -123.192
   }
   
   // MARK: - Accessibility
@@ -235,14 +253,14 @@ Shows: ★★★★☆ (123)
   
   /// Overriding the function to detect the first touch gesture.
   open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesBegan(touches, with: event)
+    if settings.passTouchesToSuperview { super.touchesBegan(touches, with: event) }
     guard let location = touchLocationFromBeginningOfRating(touches) else { return }
     onDidTouch(location)
   }
   
   /// Overriding the function to detect touch move.
   open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesMoved(touches, with: event)
+    if settings.passTouchesToSuperview { super.touchesMoved(touches, with: event) }
     guard let location = touchLocationFromBeginningOfRating(touches) else { return }
     onDidTouch(location)
   }
@@ -260,8 +278,18 @@ Shows: ★★★★☆ (123)
   
   /// Detecting event when the user lifts their finger.
   open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-    super.touchesEnded(touches, with: event)
-    
+    if settings.passTouchesToSuperview { super.touchesEnded(touches, with: event) }
+    didFinishTouchingCosmos?(rating)
+  }
+
+  /**
+   
+   Detecting event when the touches are cancelled (can happen in a scroll view).
+   Behave as if user has lifted their finger.
+   
+   */
+  open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    if settings.passTouchesToSuperview { super.touchesCancelled(touches, with: event) }
     didFinishTouchingCosmos?(rating)
   }
 
@@ -388,6 +416,18 @@ Shows: ★★★★☆ (123)
   @IBInspectable var minTouchRating: Double = CosmosDefaultSettings.minTouchRating {
     didSet {
       settings.minTouchRating = minTouchRating
+    }
+  }
+  
+  @IBInspectable var filledImage: UIImage? {
+    didSet {
+      settings.filledImage = filledImage
+    }
+  }
+  
+  @IBInspectable var emptyImage: UIImage? {
+    didSet {
+      settings.emptyImage = emptyImage
     }
   }
   

@@ -6,11 +6,11 @@ Pod::Spec.new do |spec|
   spec.license = { type: 'MIT', file: 'LICENSE' }
   spec.authors = { "chilijung" => 'chilijung@gmail.com' }
 
-  spec.platform = :ios, "9.0"
+  spec.platform = :ios, "9.3"
   spec.requires_arc = true
   spec.source = { git: "https://github.com/canner/RatingRow.git", tag: "v#{spec.version}", submodules: true }
   spec.source_files = "RatingRow/**/*.{h,swift}"
   spec.ios.frameworks = 'UIKit', 'Foundation'
-  spec.dependency "Eureka", "~> 3.0"
-  spec.dependency "Cosmos", "~> 9.0"
+  spec.dependency "Eureka", "~> 5.0"
+  spec.dependency "Cosmos", "~> 18.0"
 end

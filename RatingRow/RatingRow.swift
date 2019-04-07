@@ -26,7 +26,7 @@ public class RatingCell: Cell<Double>, CellType {
         
         cosmosRating.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(cosmosRating)
-        height = {44}
+        height = { 44 }
         
         // set constraints in tableView
         let topConstraint = NSLayoutConstraint(item: cosmosRating, attribute: .centerY, relatedBy: .equal, toItem: contentView, attribute: .centerY, multiplier: 1.0, constant: 0.0)

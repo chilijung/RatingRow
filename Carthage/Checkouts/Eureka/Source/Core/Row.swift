@@ -24,7 +24,7 @@
 
 import Foundation
 
-open class RowOf<T: Equatable>: BaseRow {
+open class RowOf<T>: BaseRow where T: Equatable {
 
     private var _value: T? {
         didSet {
@@ -55,7 +55,7 @@ open class RowOf<T: Equatable>: BaseRow {
             _value = newValue
             guard let _ = section?.form else { return }
             wasChanged = true
-            if validationOptions.contains(.validatesOnChange) || (wasBlurred && validationOptions.contains(.validatesOnChangeAfterBlurred)) || !isValid {
+            if validationOptions.contains(.validatesOnChange) || (wasBlurred && validationOptions.contains(.validatesOnChangeAfterBlurred)) ||  (!isValid && validationOptions != .validatesOnDemand) {
                 validate()
             }
         }
@@ -63,15 +63,15 @@ open class RowOf<T: Equatable>: BaseRow {
             return _value
         }
     }
+    
+    /// The reset value of this row. Sets the value property to the value of this row on the resetValue method call.
+    open var resetValue: T?
 
     /// The untyped value of this row.
     public override var baseValue: Any? {
         get { return value }
         set { value = newValue as? T }
     }
-
-    /// Variable used in rows with options that serves to generate the options for that row.
-    public var dataProvider: DataProvider<T>?
 
     /// Block variable used to get the String that should be displayed for the value of this row.
     public var displayValueFor: ((T?) -> String?)? = {
@@ -82,14 +82,25 @@ open class RowOf<T: Equatable>: BaseRow {
         super.init(tag: tag)
     }
 
-    internal var rules: [ValidationRuleHelper<T>] = []
+    public internal(set) var rules: [ValidationRuleHelper<T>] = []
 
     @discardableResult
     public override func validate() -> [ValidationError] {
+        #if swift(>=4.1)
+        validationErrors = rules.compactMap { $0.validateFn(value) }
+        #else
         validationErrors = rules.flatMap { $0.validateFn(value) }
+        #endif
         return validationErrors
     }
+    
+    /// Resets the value of the row. Setting it's value to it's reset value.
+    public func resetRowValue() {
+        value = resetValue
+    }
 
+    /// Add a Validation rule for the Row
+    /// - Parameter rule: RuleType object to add
     public func add<Rule: RuleType>(rule: Rule) where T == Rule.RowValueType {
         let validFn: ((T?) -> ValidationError?) = { (val: T?) in
             return rule.isValid(value: val)
@@ -97,12 +108,14 @@ open class RowOf<T: Equatable>: BaseRow {
         rules.append(ValidationRuleHelper(validateFn: validFn, rule: rule))
     }
 
+    /// Add a Validation rule set for the Row
+    /// - Parameter ruleSet: RuleSet<T> set of rules to add
     public func add(ruleSet: RuleSet<T>) {
         rules.append(contentsOf: ruleSet.rules)
     }
 
     public func remove(ruleWithIdentifier identifier: String) {
-        if let index = rules.index(where: { (validationRuleHelper) -> Bool in
+        if let index = rules.firstIndex(where: { (validationRuleHelper) -> Bool in
             return validationRuleHelper.rule.id == identifier
         }) {
             rules.remove(at: index)
